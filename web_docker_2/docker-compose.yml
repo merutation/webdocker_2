@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+    container_name: django_web_2
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app  # Mount the app directory
+      - django_static:/app/static  # Volume for static files
+      - django_media:/app/media    # Volume for uploaded files
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db 
+      - DB_PORT=5432
+    networks:
+      - my_custom_network  
+
+  db:
+    image: postgres:latest
+    container_name: postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Volume for PostgreSQL data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    networks:
+      - my_custom_network 
+
+volumes:
+  postgres_data:          # Volume for PostgreSQL data
+  django_static:         # Volume for Django static files
+  django_media:          # Volume for Django uploaded files
+
+networks:
+  my_custom_network:
